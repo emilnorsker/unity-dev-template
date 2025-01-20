@@ -33,11 +33,14 @@ crashlytics-build.properties
 result
 result-*
 
-# Unity Project Settings
+# Unity Project Settings - Only track essential files
 /UnityProject/ProjectSettings/*
-!/UnityProject/ProjectSettings/ProjectSettings.asset
 !/UnityProject/ProjectSettings/ProjectVersion.txt
-!/UnityProject/ProjectSettings/PackageManagerSettings.asset
 
-# Unity Packages
-/UnityProject/Packages/packages-lock.json 
+# Unity Packages - Only track manifest
+/UnityProject/Packages/*
+!/UnityProject/Packages/manifest.json
+
+# Resources
+/UnityProject/Assets/Resources/
+/UnityProject/Assets/Resources.meta 
