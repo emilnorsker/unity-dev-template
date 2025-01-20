@@ -31,4 +31,14 @@ crashlytics-build.properties
 # Nix
 .direnv
 result
-result-* 
+result-*
+
+# Unity Project Settings
+/UnityProject/ProjectSettings/*
+!/UnityProject/ProjectSettings/ProjectSettings.asset
+!/UnityProject/ProjectSettings/ProjectVersion.txt
+!/UnityProject/ProjectSettings/EditorBuildSettings.asset
+!/UnityProject/ProjectSettings/PackageManagerSettings.asset
+
+# Unity Packages
+/UnityProject/Packages/packages-lock.json 
