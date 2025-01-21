@@ -9,78 +9,94 @@
   outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = import nixpkgs { config.allowUnfree = true; inherit system; };
         
         unity_editor = pkgs.buildFHSEnv {
           name = "unity_editor";
-          targetPkgs = pkgs: with pkgs; [
-            # Basic system libraries
-            libxml2
-            libGL
-            libGLU
-            icu
-            
-            # X11 and display related
-            xorg.libX11
-            xorg.libXcursor
-            xorg.libXrandr
-            xorg.libXinerama
-            xorg.libXi
-            xorg.libXext
-            xorg.libXfixes
-            xorg.libXrender
-            xorg.libXcomposite
-            xorg.libXdamage
-            
-            # System and UI libraries
-            systemd
-            gtk3
-            gdk-pixbuf
-            glib
-            zlib
-            
-            # Audio libraries
-            alsa-lib
-            pulseaudio
-            
-            # Additional dependencies
-            udev
-            libpulseaudio
-            libdrm
-            mesa
-            vulkan-loader
-            bzip2
-            cups
-            dbus
-            fontconfig
-            freetype
-            openssl
-            gcc
-            gdb
-            
-            cairo
-            pango
-            atk
-            freetype
-            fontconfig
-            dbus
-            xorg.libXcomposite
-            xorg.libXdamage
-            xorg.libXext
-            xorg.libXfixes
-            xorg.libXi
-            xorg.libXrender
-            xorg.libXtst
-            xorg.libxcb
-            libdrm
-            mesa
-            pulseaudio
-            libcap
-            libunwind
-            libuuid
-            nspr
-            nss
-          ];
+
+          # these deps were taken from the fhsenv used by the unityhub package in nixpkgs
+          targetPkgs =
+            pkgs:
+            with pkgs;
+            [
+              # Unity Hub binary dependencies
+              xorg.libXrandr
+              xdg-utils
+      
+              # GTK filepicker
+              gsettings-desktop-schemas
+              hicolor-icon-theme
+      
+              # Bug Reporter dependencies
+              fontconfig
+              freetype
+              lsb-release
+            ]
+            ++ extraPkgs pkgs;
+
+          multiPkgs =
+            pkgs:
+            with pkgs;
+            [
+              # Unity Hub ldd dependencies
+              cups
+              gtk3
+              expat
+              libxkbcommon
+              lttng-ust_2_12
+              krb5
+              alsa-lib
+              nss
+              libdrm
+              libgbm
+              nspr
+              atk
+              dbus
+              at-spi2-core
+              pango
+              xorg.libXcomposite
+              xorg.libXext
+              xorg.libXdamage
+              xorg.libXfixes
+              xorg.libxcb
+              xorg.libxshmfence
+              xorg.libXScrnSaver
+              xorg.libXtst
+      
+              # Unity Hub additional dependencies
+              libva
+              openssl
+              cairo
+              libnotify
+              libuuid
+              libsecret
+              udev
+              libappindicator
+              wayland
+              cpio
+              icu
+              libpulseaudio
+      
+              # Unity Editor dependencies
+              libglvnd # provides ligbl
+              xorg.libX11
+              xorg.libXcursor
+              glib
+              gdk-pixbuf
+              libxml2
+              zlib
+              clang
+              git # for git-based packages in unity package manager
+      
+              # Unity Editor 2019 specific dependencies
+              xorg.libXi
+              xorg.libXrender
+              gnome2.GConf
+              libcap
+      
+              # Unity Editor 6000 specific dependencies
+              harfbuzz
+            ];
           runScript = "~/Unity/Hub/Editor/6000.0.34f1/Editor/Unity";
         };
 
@@ -110,7 +126,6 @@
             just
           ];
 
-
           shellHook = ''                                    
             unity_install
             echo "🎮 Unity Development Environment"
@@ -120,9 +135,7 @@
             echo "just unity - Launch Unity Editor directly"
             echo "just test - Run tests in unity project"
             echo "just install - Install Unity Editor"
-            # Add Unity to PATH
-            export PATH=${pkgs.unityhub}/bin:$PATH
-            
+            echo "  unity           - Launch Unity Editor directly"
           '';
         };
       }
