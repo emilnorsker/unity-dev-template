@@ -2,19 +2,7 @@
 set shell := ["bash", "-c"]
 set dotenv-load := true
 
-default:
-    @just --list
-
-# Launch Unity
-unity *args: ensure-license
-    unity_editor \
-        -username "$UNITY_USERNAME" \
-        -password "$UNITY_PASSWORD" \
-        -projectPath "$(pwd)/UnityProject" \
-        {{args}}
-
-# Ensure Unity license is set up
-ensure-license:
+_ensure-license:
     #!/usr/bin/env bash
     LICENSE_PATH=~/.local/share/unity3d/Unity/Unity_lic.ulf
     
@@ -34,9 +22,72 @@ ensure-license:
         exit 1
     fi
 
-# Hidden helper command for license activation
-_activate file:
+
+default:
+    @just --list
+
+# Launch Unity
+unity *args: _ensure-license
+    unity_editor \
+        -username "$UNITY_USERNAME" \
+        -password "$UNITY_PASSWORD" \
+        -projectPath "$(pwd)/UnityProject" \
+        {{args}}
+
+# Run Unity tests and display results
+test: _ensure-license
     #!/usr/bin/env bash
-    echo "🔑 Activating Unity license..."
-    unity_editor -batchmode -manualLicenseFile "{{file}}" -logFile -
-    echo "✅ License activated! Run 'just' to start Unity" 
+    echo "🧪 Running Unity tests..."
+    
+    # Run the tests
+    unity_editor \
+        -username "$UNITY_USERNAME" \
+        -password "$UNITY_PASSWORD" \
+        -projectPath "$(pwd)/UnityProject" \
+        -batchmode \
+        -runTests \
+        -testResults "$(pwd)/test-results.xml" \
+        -testPlatform PlayMode
+    
+    # Check if test results exist
+    if [ ! -f "test-results.xml" ]; then
+        echo "❌ No test results found!"
+        exit 1
+    fi
+    
+    echo ""
+    echo "📊 Test Results Summary:"
+    echo "===================="
+    
+    # Parse the XML file using xmllint with default values if not found
+    TOTAL=$(xmllint --xpath "string(/test-run/@total)" test-results.xml 2>/dev/null || echo "0")
+    PASSED=$(xmllint --xpath "string(/test-run/@passed)" test-results.xml 2>/dev/null || echo "0")
+    FAILED=$(xmllint --xpath "string(/test-run/@failed)" test-results.xml 2>/dev/null || echo "0")
+    SKIPPED=$(xmllint --xpath "string(/test-run/@skipped)" test-results.xml 2>/dev/null || echo "0")
+    DURATION=$(xmllint --xpath "string(/test-run/@duration)" test-results.xml 2>/dev/null || echo "0")
+    
+    # Convert empty strings to 0
+    TOTAL=${TOTAL:-0}
+    PASSED=${PASSED:-0}
+    FAILED=${FAILED:-0}
+    SKIPPED=${SKIPPED:-0}
+    DURATION=${DURATION:-0}
+    
+    # Display summary
+    echo "✨ Total Tests: $TOTAL"
+    echo "✅ Passed: $PASSED"
+    echo "❌ Failed: $FAILED"
+    echo "⏭️  Skipped: $SKIPPED"
+    echo "⏱️  Duration: $DURATION seconds"
+    echo ""
+    
+    # If there are failures, show them
+    if [ "$FAILED" -gt 0 ]; then
+        echo "Failed Tests:"
+        echo "============"
+        xmllint --xpath "//test-case[@result='Failed']/@name" test-results.xml 2>/dev/null | tr ' ' '\n' | cut -d'"' -f2 || echo "Could not parse failed test names"
+        echo ""
+    fi
+    
+    # Exit with failure if any tests failed
+    [ "$FAILED" -eq 0 ]
