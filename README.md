@@ -19,7 +19,7 @@ A minimal Unity project setup with testing capabilities, using Nix for reproduci
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/emilnorsker/unity-dev-template.git
    cd unity-dev-template
    ```
 
