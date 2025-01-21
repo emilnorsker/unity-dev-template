@@ -80,15 +80,13 @@
             libuuid
             nspr
             nss
-            systemd
           ];
-          runScript = "/home/norsker/Unity/Hub/Editor/6000.0.34f1/Editor/Unity";
+          runScript = "~/Unity/Hub/Editor/6000.0.34f1/Editor/Unity";
         };
 
         unity_install = pkgs.writeScriptBin "unity_install" ''s
           #!${pkgs.bash}/bin/bash
           
-          export PATH=${pkgs.unityhub}/bin:$PATH
           
           UNITY_VERSION="6000.0.34f1"
           

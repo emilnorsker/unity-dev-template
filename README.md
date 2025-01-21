@@ -14,14 +14,13 @@ A minimal Unity project setup with testing capabilities, using Nix for reproduci
 - Nix package manager
 - Unity account (for license)
 - Git
-- xmllint (for test result parsing)
 
 ## Getting Started
 
 1. Clone the repository:
    ```bash
    git clone <repository-url>
-   cd unityminimal
+   cd unity-dev-template
    ```
 
 2. Copy the environment template:
