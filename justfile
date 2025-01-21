@@ -85,8 +85,19 @@ test: _ensure-license
     if [ "$FAILED" -gt 0 ]; then
         echo "Failed Tests:"
         echo "============"
-        xmllint --xpath "//test-case[@result='Failed']/@name" test-results.xml 2>/dev/null | tr ' ' '\n' | cut -d'"' -f2 || echo "Could not parse failed test names"
         echo ""
+        # Find all failed test cases
+        xmllint --xpath "//test-case[@result='Failed']" test-results.xml 2>/dev/null | while IFS= read -r line; do
+            # Extract test name and message using xmllint
+            TEST_NAME=$(echo "$line" | xmllint --xpath "string(//@name)" - 2>/dev/null)
+            ERROR_MSG=$(echo "$line" | xmllint --xpath "string(//failure/message)" - 2>/dev/null)
+            
+            # Print test name and error message
+            echo "❌ $TEST_NAME"
+            echo "-------------------"
+            echo "$ERROR_MSG"
+            echo ""
+        done
     fi
     
     # Exit with failure if any tests failed
