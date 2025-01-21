@@ -110,13 +110,16 @@
             just
           ];
 
+
           shellHook = ''                                    
+            unity_install
             echo "🎮 Unity Development Environment"
             echo "Unity version: 6000.0.34f1 (Unity 6)"
             echo ""
             echo "Available commands:"
-            echo "  unity           - Launch Unity Editor directly"
-            
+            echo "just unity - Launch Unity Editor directly"
+            echo "just test - Run tests in unity project"
+            echo "just install - Install Unity Editor"
             # Add Unity to PATH
             export PATH=${pkgs.unityhub}/bin:$PATH
             
