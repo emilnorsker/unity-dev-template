@@ -14,6 +14,7 @@ A minimal Unity project setup with testing capabilities, using Nix for reproduci
 - Nix package manager
 - Unity account (for license)
 - Git
+- xmllint (for test result parsing)
 
 ## Getting Started
 
@@ -42,10 +43,32 @@ A minimal Unity project setup with testing capabilities, using Nix for reproduci
 
 ## Development
 
-- Run tests:
-  ```bash
-  just unity -batchmode -runTests
-  ```
+### Running Tests
+
+Run all PlayMode tests with nice output:
+```bash
+just test
+```
+
+Example output:
+```
+🧪 Running Unity tests...
+
+📊 Test Results Summary:
+====================
+✨ Total Tests: 1
+✅ Passed: 1
+❌ Failed: 0
+⏭️  Skipped: 0
+⏱️  Duration: 0.42 seconds
+```
+
+You can also run tests with custom parameters:
+```bash
+just unity -batchmode -runTests -testPlatform PlayMode
+```
+
+Test results will be saved to `test-results.xml` in the project root.
 
 ## Project Structure
 
